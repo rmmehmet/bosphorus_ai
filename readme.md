@@ -63,6 +63,8 @@ Temizlenmiş Türkçe Cevap
 FastAPI  ──►  React Frontend
 ```
 
+![Sistem Akışı](imgs/terminal-output.png)
+
 **Veri akışı özeti:**
 
 1. Soru `SemanticRouter`'a gelir; `paraphrase-multilingual-MiniLM-L12-v2` modeli ile tool açıklamalarına karşı cosine similarity hesaplanır.
@@ -73,6 +75,8 @@ FastAPI  ──►  React Frontend
 6. Cevap temizlenerek kullanıcıya döndürülür.
 
 ---
+
+![Uygulama Arayüzü](imgs/web_application_interface.png)
 
 ## Özellikler
 
@@ -93,6 +97,7 @@ FastAPI  ──►  React Frontend
 - Python 3.10+
 - Node.js (sadece frontend için)
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) (lokal LLM için)
+- [llama.cpp](https://github.com/ggml-org/llama.cpp/releases/download/b9555/llama-b9555-bin-win-cuda-12.4-x64.zip) (CUDA desteği için bu modeli kullanın)
 
 ### 1. Repoyu klonla
 
@@ -112,6 +117,7 @@ pip install -r backend/requirements.txt
 ### 3. LLM Sunucusunu başlat
 
 llama.cpp ile bir GGUF modeli indir ve sunucuyu başlat:
+indirdiğiniz llama.cpp klasörün dizine gidin aşağıdaki komutu çalıştırın
 
 ```bash
 # Model indirme örneği (Meta-Llama-3.1-8B-Instruct-Q4_K_M)
