@@ -1,8 +1,3 @@
-"""
-Bosphorus AI MCP Server
-Kurulum : pip install fastmcp
-Çalıştırma: python mcp_server.py
-"""
 from fastmcp import FastMCP
 from tools import (
     get_holidays,

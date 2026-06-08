@@ -80,11 +80,11 @@ def get_weather_from_excel() -> str:
     ]
     current_month = months_tr[datetime.now().month - 1]
 
-    # Kolon adı normalize et
+    # Kolon adı normalize edilirken boşluklar kaldırılır, böylece "Sıcaklık (°C)" → "Sıcaklık(°C)" olur ve LLM'in parametre eşleştirmesi kolaylaşır
     df.columns = [str(c).strip() for c in df.columns]
     metric_col = df.columns[0]
 
-    # Hedef ay kolonu var mı?
+    # Hedef ay kolonu var mı kontrolü — eğer yoksa Excel yapısı değişmiş olabilir, bu durumda hata fırlatılır ve agent API'ye geçer
     if current_month not in df.columns:
         raise ValueError(f"Excel'de '{current_month}' kolonu yok. Mevcut: {list(df.columns)}")
 

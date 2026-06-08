@@ -19,7 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Agent başlatma hatası sunucuyu çökertmesin
 try:
     agent = BosphorusAgent()
     _agent_ready = True

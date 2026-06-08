@@ -14,11 +14,10 @@ class LlamaClient:
     def complete(self, prompt: str, max_tokens: int = 400, temperature: float = 0.4) -> str:
         payload = {
             "prompt": prompt,
-            "n_predict": max_tokens,  # 150→400, cevap artık yarıda kalmaz
+            "n_predict": max_tokens,  
             "temperature": temperature,
             "repeat_penalty": 1.3,
             "repeat_last_n": 64,
-            # Stop token listesi sadeleştirildi — çok agresif olanlar kaldırıldı
             "stop": [
                 "</s>",
                 "<|eot_id|>",
@@ -38,7 +37,7 @@ class LlamaClient:
             )
             resp.raise_for_status()
             content = resp.json().get("content", "").strip()
-            # Cevap gerçekten boşsa açıklayıcı mesaj dön
+            # Cevap gerçekten boşsa açıklayıcı mesaj döndürlür
             if not content:
                 return "Yanıt üretilemedi, lütfen tekrar deneyin."
             return content

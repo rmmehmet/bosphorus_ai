@@ -6,14 +6,6 @@ from tools import (
 from llm_client import LlamaClient
 from router import SemanticRouter
 
-# ---------------------------------------------------------------------------
-# Prompt — LLM'nin cevabı neden yarıda kestiğinin ana nedeni buydu:
-#   1) CEVAP: etiketinden sonra model kendi çıktısını "meta-cevap" olarak görüp duruyordu
-#   2) max_tokens 300 çok kısıydı
-#   3) stop token listesi çok agresifti ("1.", "adım" gibi)
-# Şimdi: daha yönlendirici, cevabın bitmesini garantileyen bir prompt.
-# ---------------------------------------------------------------------------
-
 ANSWER_PROMPT = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 Sen Bosphorus AI'sın; İstanbul hakkında kısa, doğru, Türkçe yanıtlar veren bir asistansın.
 MUTLAK KURALLAR:
@@ -37,6 +29,9 @@ def log(msg: str):
 
 
 class BosphorusAgent:
+    """BosphorusAgent, gelen soruyu SemanticRouter ile analiz eder, ilgili tool'ları çağırır
+    ve sonuçları LlamaClient ile işleyerek nihai cevabı üretir.
+    """
     def __init__(self):
         self.llm = LlamaClient()
         self.model_name = self.llm.model_name
@@ -100,7 +95,7 @@ class BosphorusAgent:
                 results[name] = self._execute(name, call.get("arguments", {}))
                 log(f"✓ {name} tamamlandı")
 
-                # Excel hava başarıyla okunduysa API ile de destekle
+                # Excel hava başarıyla okunduysa API ile de desteklenir
                 if name == "get_weather_from_excel":
                     log("🌤  Excel verisi alındı, anlık API tahminiyle destekleniyor...")
                     try:
@@ -111,7 +106,7 @@ class BosphorusAgent:
 
             except FileNotFoundError as e:
                 log(f"⚠️  {name}: Dosya bulunamadı — {e}")
-                # Excel yoksa direkt API'ye geç
+                # Excel yoksa direkt API'ye geçilir
                 if name == "get_weather_from_excel":
                     log("🌤  Excel yok → Open-Meteo API'ye geçiliyor...")
                     try:
@@ -141,7 +136,7 @@ class BosphorusAgent:
         log(f"Sonuç derleniyor ({len(results)} kaynaktan veri alındı)...")
         log("🤖 LLM cevap üretiyor...")
 
-        # Her kaynaktan max 600 karakter al (önceden 500'dü; daha fazla bağlam = daha iyi cevap)
+        # Her kaynaktan max 600 karakter alarak LLM'ye gönderiyoruz; böylece uzun veriler de yarıda kesilmeden özetlenebilir
         data_summary = "\n\n".join(
             [f"[{k}]:\n{v[:600]}" for k, v in results.items()]
         )
@@ -163,7 +158,8 @@ class BosphorusAgent:
 def _clean_answer(text: str) -> str:
     """
     Hallüsinasyon ve meta-çıktı kalıplarını temizler.
-    Artık cümle ortasında kesme yok — sadece belirli meta kalıpları içeren satırlar kaldırılır.
+    Artık cümle ortasında kesme yok — sadece belirli meta kalıpları içeren satırlar kaldırılır
+    Parametre olarak LLM'den gelen ham cevabı alır, temizler ve kullanıcıya sunulacak nihai cevaba dönüştürür.
     """
     import re
 
